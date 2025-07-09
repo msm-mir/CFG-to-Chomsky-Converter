@@ -11,8 +11,6 @@
 
 using namespace std;
 
-void inputPro(ProductionRule&, const string&);
-void proCheck(const char&, char&, string&, bool&);
 void newStartVar(ProductionRule&, Variable&, const char&);
 void deleteUnsubCheck(ProductionRule&, Variable&, const Terminal&);
 void deleteNullCheck(ProductionRule&, Variable&);
@@ -53,7 +51,7 @@ int main() {
         string pro;
         getline(cin, pro);
 
-        inputPro(production, pro);
+        production.inputRule(pro);
     }
 
     newStartVar(production, variable, S);
@@ -70,35 +68,6 @@ int main() {
     print(production, terminal);
 
     return 0;
-}
-
-void inputPro(ProductionRule& production, const string& pro) {
-    bool b = true;
-    string s;
-    char first;
-    set<string> second;
-
-    for (char c : pro) {
-        if (c == '|') {
-            second.insert(s);
-            s.clear();
-        }
-        proCheck(c, first, s, b);
-    }
-    second.insert(s);
-    production.p.insert({first, second});
-    production.order.push_back(first);
-}
-
-void proCheck(const char& c, char& first, string& s, bool& b) {
-    if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c == '@')) {
-        if (b && (c >= 'A' && c <= 'Z')) {
-            first = c;
-            b = false;
-        } else {
-            s += c;
-        }
-    }
 }
 
 void newStartVar(ProductionRule& production, Variable& variable, const char& S) {

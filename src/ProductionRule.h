@@ -12,6 +12,8 @@ public:
     map<char, set<string>> p;
     vector<char> order;
     ProductionRule();
+    void inputRule(const string&);
+    static void ruleCheck(const char&, char&, string&, bool&);
 };
 
 #endif //SRC_PRODUCTIONRULE_H
