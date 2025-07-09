@@ -5,8 +5,6 @@
 
 using namespace std;
 
-void newVarForTwoVar(ProductionRule &, Variable &, const Terminal &);
-
 void findVarForTwoVar(ProductionRule &, Variable &, string &);
 
 bool checkExistVar(ProductionRule &, string &);
@@ -50,28 +48,10 @@ int main() {
     productionRule.findInaccessibleLHS(variable);
     terminal.terminals.erase('@');
     productionRule.newSymbolForTerminals(variable, terminal);
-    newVarForTwoVar(variable, terminal);
+    productionRule.newSymbolForDoubleSymbols(variable, terminal);
     print(terminal);
 
     return 0;
-}
-
-void newVarForTwoVar(ProductionRule &production, Variable &variable, const Terminal &terminal) {
-    for (auto &p: production.rule) {
-        set<string> update;
-        for (auto s: p.second) {
-            if (s.size() == 1 && terminal.terminals.find(s.at(0)) != terminal.terminals.end()) {
-                update.insert(s);
-                continue;
-            }
-            string str = s;
-            while (str.size() > 2) {
-                findVarForTwoVar(production, variable, str);
-            }
-            update.insert(str);
-        }
-        p.second = update;
-    }
 }
 
 void findVarForTwoVar(ProductionRule &production, Variable &variable, string &str) {

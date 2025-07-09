@@ -301,3 +301,21 @@ void ProductionRule::replaceNewSymbolForTerminal(const char &before, const char 
         rules.second = updateRHSs;
     }
 }
+
+void ProductionRule::newSymbolForDoubleSymbols(Variable &variable, const Terminal &terminal) {
+    for (auto &rules: this->rule) {
+        set<string> updateRHSs;
+        for (auto RHS: rules.second) {
+            if (RHS.size() == 1 && terminal.terminals.find(RHS.at(0)) != terminal.terminals.end()) {
+                updateRHSs.insert(RHS);
+                continue;
+            }
+            string strRHS = RHS;
+            while (strRHS.size() > 2) {
+                this->findVarForTwoVar(variable, strRHS);
+            }
+            updateRHSs.insert(strRHS);
+        }
+        rules.second = updateRHSs;
+    }
+}

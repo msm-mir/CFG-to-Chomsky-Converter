@@ -43,6 +43,8 @@ public:
     void newSymbolForTerminals(Variable &, const Terminal &);
 
     void replaceNewSymbolForTerminal(const char &, const char &);
+
+    void newSymbolForDoubleSymbols(Variable &, const Terminal &);
 };
 
 #endif //SRC_PRODUCTIONRULE_H
