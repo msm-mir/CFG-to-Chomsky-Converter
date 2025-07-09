@@ -5,6 +5,7 @@
 #include <set>
 #include <vector>
 #include <map>
+#include <queue>
 #include "Variable.h"
 #include "Terminal.h"
 
@@ -34,6 +35,8 @@ public:
     void removeUnitRHS(const map<char, set<string>>::iterator &, const char &);
 
     void findUselessRHS(Variable &, const Terminal &);
+
+    void findInaccessibleLHS(Variable &);
 };
 
 #endif //SRC_PRODUCTIONRULE_H

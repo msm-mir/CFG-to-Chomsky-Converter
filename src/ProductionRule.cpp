@@ -208,3 +208,29 @@ void ProductionRule::findUselessRHS(Variable &variable, const Terminal &terminal
         }
     }
 }
+
+void ProductionRule::findInaccessibleLHS(Variable &variable) {
+    vector<pair<char, bool>> checkVarIsAccessible;
+    checkVarIsAccessible.reserve(this->order.size());
+
+    for (char LHS: this->order) {
+        auto itV = variable.symbols.find(LHS);
+        if (LHS == '0' || LHS == 'S') checkVarIsAccessible.emplace_back(LHS, true);
+        else checkVarIsAccessible.emplace_back(LHS, false);
+    }
+
+    queue <vector<pair<char, bool>>::iterator> visitVariables;
+    visitVariables.push(checkVarIsAccessible.begin());
+
+    while (!visitVariables.empty()) {
+        this->deleteInaccessible(variable, checkVarIsAccessible, visitVariables);
+    }
+
+    for (auto ch: checkVarIsAccessible) {
+        if (!ch.second) {
+            this->rule.erase(ch.first);
+            this->order.erase(std::find(this->order.begin(), this->order.end(), ch.first));
+            variable.symbols.erase(ch.first);
+        }
+    }
+}

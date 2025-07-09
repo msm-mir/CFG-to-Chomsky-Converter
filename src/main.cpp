@@ -5,8 +5,6 @@
 
 using namespace std;
 
-void deleteInaccessibleCheck(ProductionRule &, Variable &);
-
 void deleteInaccessible(ProductionRule &, const Variable &, vector<pair<char, bool>> &,
                         queue <vector<pair<char, bool>>::iterator> &);
 
@@ -56,39 +54,13 @@ int main() {
     productionRule.findUselessRHS(variable, terminal);
     productionRule.findUnitRHS(variable);
     productionRule.findUselessRHS(variable, terminal);
-    deleteInaccessibleCheck(variable);
+    productionRule.findInaccessibleLHS(variable);
     terminal.terminals.erase('@');
     newVarForTer(variable, terminal);
     newVarForTwoVar(variable, terminal);
     print(terminal);
 
     return 0;
-}
-
-void deleteInaccessibleCheck(ProductionRule &production, Variable &variable) {
-    vector<pair<char, bool>> check;
-    check.reserve(production.order.size());
-
-    for (char c: production.order) {
-        auto itV = variable.symbols.find(c);
-        if (c == '0' || c == 'S') check.emplace_back(c, true);
-        else check.emplace_back(c, false);
-    }
-
-    queue <vector<pair<char, bool>>::iterator> visit;
-    visit.push(check.begin());
-
-    while (!visit.empty()) {
-        deleteInaccessible(production, variable, check, visit);
-    }
-
-    for (auto ch: check) {
-        if (!ch.second) {
-            production.rule.erase(ch.first);
-            production.order.erase(std::find(production.order.begin(), production.order.end(), ch.first));
-            variable.symbols.erase(ch.first);
-        }
-    }
 }
 
 void deleteInaccessible(ProductionRule &production, const Variable &variable, vector<pair<char, bool>> &check,
