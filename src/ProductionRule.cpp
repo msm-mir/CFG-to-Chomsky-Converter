@@ -312,7 +312,7 @@ void ProductionRule::findDoubleSymbolsForNewSymbol(Variable &variable, const Ter
             }
             string strRHS = RHS;
             while (strRHS.size() > 2) {
-                this->findVarForTwoVar(variable, strRHS);
+                this->newSymbolForDoubleSymbols(variable, strRHS);
             }
             updateRHSs.insert(strRHS);
         }
@@ -320,7 +320,7 @@ void ProductionRule::findDoubleSymbolsForNewSymbol(Variable &variable, const Ter
     }
 }
 
-void ProductionRule::findVarForTwoVar(Variable &variable, string &strRHS) {
+void ProductionRule::newSymbolForDoubleSymbols(Variable &variable, string &strRHS) {
     if (!this->checkExistVar(strRHS)) {
         string doubleSymbols;
         doubleSymbols = strRHS.substr(0, 2);

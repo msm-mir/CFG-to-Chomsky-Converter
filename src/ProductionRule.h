@@ -46,7 +46,7 @@ public:
 
     void findDoubleSymbolsForNewSymbol(Variable &, const Terminal &);
 
-    void findVarForTwoVar(Variable &, string &);
+    void newSymbolForDoubleSymbols(Variable &, string &);
 };
 
 #endif //SRC_PRODUCTIONRULE_H
