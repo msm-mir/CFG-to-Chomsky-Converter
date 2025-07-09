@@ -253,3 +253,29 @@ void ProductionRule::removeInaccessibleLHS(const Variable &variable, vector<pair
         }
     }
 }
+
+void ProductionRule::newSymbolForTerminals(Variable &variable, const Terminal &terminal) {
+    for (char charTerminal: terminal.terminals) {
+        for (char charVariable: variable.symbols) {
+            auto itR = this->rule.find(charVariable);
+            string strTerminal;
+            strTerminal = charTerminal;
+            if (itR->second.size() == 1 && *(itR->second.begin()) == strTerminal) {
+                this->replaceTerToVal(charTerminal, charVariable);
+                break;
+            }
+            if ((charVariable + 1 >= 'A' && charVariable + 1 <= 'Z') && variable.symbols.find((char) (charVariable + 1)) == variable.symbols.end()) {
+                charVariable++;
+                variable.symbols.insert(charVariable);
+                this->order.push_back(charVariable);
+
+                string strTer;
+                strTer = charTerminal;
+                this->rule.insert({charVariable, {strTer}});
+
+                this->replaceTerToVal(charTerminal, charVariable);
+                break;
+            }
+        }
+    }
+}

@@ -39,6 +39,8 @@ public:
     void findInaccessibleLHS(Variable &);
 
     void removeInaccessibleLHS(const Variable &, vector<pair<char, bool>> &, queue <vector<pair<char, bool>>::iterator> &);
+
+    void newSymbolForTerminals(Variable &, const Terminal &);
 };
 
 #endif //SRC_PRODUCTIONRULE_H

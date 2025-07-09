@@ -5,8 +5,6 @@
 
 using namespace std;
 
-void newVarForTer(ProductionRule &, Variable &, const Terminal &);
-
 void replaceTerToVal(ProductionRule &, const char &, const char &);
 
 void newVarForTwoVar(ProductionRule &, Variable &, const Terminal &);
@@ -53,37 +51,11 @@ int main() {
     productionRule.findUselessRHS(variable, terminal);
     productionRule.findInaccessibleLHS(variable);
     terminal.terminals.erase('@');
-    newVarForTer(variable, terminal);
+    productionRule.newSymbolForTerminals(variable, terminal);
     newVarForTwoVar(variable, terminal);
     print(terminal);
 
     return 0;
-}
-
-void newVarForTer(ProductionRule &production, Variable &variable, const Terminal &terminal) {
-    for (char c: terminal.terminals) {
-        for (char i: variable.symbols) {
-            auto itP = production.rule.find(i);
-            string tmp;
-            tmp = c;
-            if (itP->second.size() == 1 && *(itP->second.begin()) == tmp) {
-                replaceTerToVal(production, c, i);
-                break;
-            }
-            if ((i + 1 >= 'A' && i + 1 <= 'Z') && variable.symbols.find((char) (i + 1)) == variable.symbols.end()) {
-                i++;
-                variable.symbols.insert(i);
-                production.order.push_back(i);
-
-                string s;
-                s = c;
-                production.rule.insert({i, {s}});
-
-                replaceTerToVal(production, c, i);
-                break;
-            }
-        }
-    }
 }
 
 void replaceTerToVal(ProductionRule &production, const char &before, const char &after) {
