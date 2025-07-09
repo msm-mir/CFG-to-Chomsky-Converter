@@ -2,8 +2,8 @@
 
 Terminal::Terminal() = default;
 
-void Terminal::inputTer(const string& ter) {
-    for (char c : ter) {
+void Terminal::inputTer(const string &ter) {
+    for (char c: ter) {
         if (c >= 'a' && c <= 'z')
             this->terminals.insert(c);
     }

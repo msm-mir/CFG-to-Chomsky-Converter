@@ -1,31 +1,40 @@
 #include <iostream>
-#include <vector>
-#include <set>
-#include <map>
-#include <queue>
-#include <algorithm>
-#include <string>
 #include "Variable.h"
 #include "Terminal.h"
 #include "ProductionRule.h"
 
 using namespace std;
 
-void deleteUnsubCheck(ProductionRule&, Variable&, const Terminal&);
-void deleteNullCheck(ProductionRule&, Variable&);
-void deleteNull(ProductionRule&, vector<char>::iterator&, bool&, char);
-void deleteUnitLoopCheck(ProductionRule&, Variable&);
-void deleteUnitCheck(ProductionRule&, const Variable&);
-void deleteUnit(ProductionRule&, map<char, set<string>>::iterator, char);
-void deleteUselessCheck(ProductionRule&, Variable&, const Terminal&);
-void deleteInaccessibleCheck(ProductionRule&, Variable&);
-void deleteInaccessible(ProductionRule&, const Variable&, vector<pair<char, bool>>&, queue<vector<pair<char, bool>>::iterator>&);
-void newVarForTer(ProductionRule&, Variable&, const Terminal&);
-void replaceTerToVal(ProductionRule&, const char&, const char&);
-void newVarForTwoVar(ProductionRule&, Variable&, const Terminal&);
-void findVarForTwoVar(ProductionRule&, Variable&, string&);
-bool checkExistVar(ProductionRule&, string&);
-void print(const ProductionRule&, const Terminal&);
+void deleteUnsubCheck(ProductionRule &, Variable &, const Terminal &);
+
+void deleteNullCheck(ProductionRule &, Variable &);
+
+void deleteNull(ProductionRule &, vector<char>::iterator &, bool &, char);
+
+void deleteUnitLoopCheck(ProductionRule &, Variable &);
+
+void deleteUnitCheck(ProductionRule &, const Variable &);
+
+void deleteUnit(ProductionRule &, map<char, set<string>>::iterator, char);
+
+void deleteUselessCheck(ProductionRule &, Variable &, const Terminal &);
+
+void deleteInaccessibleCheck(ProductionRule &, Variable &);
+
+void deleteInaccessible(ProductionRule &, const Variable &, vector<pair<char, bool>> &,
+                        queue <vector<pair<char, bool>>::iterator> &);
+
+void newVarForTer(ProductionRule &, Variable &, const Terminal &);
+
+void replaceTerToVal(ProductionRule &, const char &, const char &);
+
+void newVarForTwoVar(ProductionRule &, Variable &, const Terminal &);
+
+void findVarForTwoVar(ProductionRule &, Variable &, string &);
+
+bool checkExistVar(ProductionRule &, string &);
+
+void print(const ProductionRule &, const Terminal &);
 
 int main() {
     int cntRules;
@@ -45,49 +54,41 @@ int main() {
     char startSymbol;
     variable.inputVariable(startSymbol, variablesInput);
 
-    ProductionRule production;
+    ProductionRule productionRule;
     while (cntRules--) {
         string rulesInput;
         getline(cin, rulesInput);
 
-        production.inputRule(rulesInput);
+        productionRule.inputRule(rulesInput);
     }
 
-    variable.newStartSymbol(production, startSymbol);
-    deleteUnsubCheck(production, variable, terminal);
-    deleteNullCheck(production, variable);
-    deleteUnitLoopCheck(production, variable);
-    deleteUselessCheck(production, variable, terminal);
-    deleteUnitCheck(production, variable);
-    deleteUselessCheck(production, variable, terminal);
-    deleteInaccessibleCheck(production, variable);
+    variable.newStartSymbol(productionRule, startSymbol);
+    variable.removeUnusedSymbols(productionRule);
+    deleteUnsubCheck(productionRule, variable, terminal);
+    deleteNullCheck(productionRule, variable);
+    deleteUnitLoopCheck(productionRule, variable);
+    deleteUselessCheck(productionRule, variable, terminal);
+    deleteUnitCheck(productionRule, variable);
+    deleteUselessCheck(productionRule, variable, terminal);
+    deleteInaccessibleCheck(productionRule, variable);
     terminal.terminals.erase('@');
-    newVarForTer(production, variable, terminal);
-    newVarForTwoVar(production, variable, terminal);
-    print(production, terminal);
+    newVarForTer(productionRule, variable, terminal);
+    newVarForTwoVar(productionRule, variable, terminal);
+    print(productionRule, terminal);
 
     return 0;
 }
 
-void deleteUnsubCheck(ProductionRule& production, Variable& variable, const Terminal& terminal) {
-    for (auto v = variable.symbols.begin(); v != variable.symbols.end(); v++) {
-        auto itP = std::find(production.order.begin(), production.order.end(), *v);
-        if (itP == production.order.end()) {
-            char c = *v;
-            v--;
-            variable.symbols.erase(c);
-        }
-    }
-
+void deleteUnsubCheck(ProductionRule &production, Variable &variable, const Terminal &terminal) {
     bool del = false;
-    for (char c : production.order) {
+    for (char c: production.order) {
         auto itP = production.rule.find(c);
         for (auto s = itP->second.begin(); s != itP->second.end(); s++) {
             if (del) {
                 s = itP->second.begin();
                 del = false;
             }
-            for (char i : *s) {
+            for (char i: *s) {
                 auto itV = variable.symbols.find(i);
                 auto itT = terminal.terminals.find(i);
 
@@ -106,7 +107,7 @@ void deleteUnsubCheck(ProductionRule& production, Variable& variable, const Term
     }
 }
 
-void deleteNullCheck(ProductionRule& production, Variable& variable) {
+void deleteNullCheck(ProductionRule &production, Variable &variable) {
     bool b = false;
     vector<char>::iterator high;
     bool change = false;
@@ -132,7 +133,7 @@ void deleteNullCheck(ProductionRule& production, Variable& variable) {
                     if (!change) c--;
                     variable.symbols.erase(itP->first);
                     production.rule.erase(itP);
-                    production.order.erase(c+1);
+                    production.order.erase(c + 1);
                 }
 
                 if (change) break;
@@ -142,11 +143,11 @@ void deleteNullCheck(ProductionRule& production, Variable& variable) {
     }
 }
 
-void deleteNull(ProductionRule& production, vector<char>::iterator& high, bool& change, char c) {
+void deleteNull(ProductionRule &production, vector<char>::iterator &high, bool &change, char c) {
     high = find(production.order.begin(), production.order.end(), c);
 
-    for (auto & i : production.rule) {
-        for (auto & j : i.second) {
+    for (auto &i: production.rule) {
+        for (auto &j: i.second) {
             string tmp = j;
             if (tmp.find(c) != string::npos) {
                 tmp.erase(tmp.find(c), 1);
@@ -167,17 +168,18 @@ void deleteNull(ProductionRule& production, vector<char>::iterator& high, bool& 
     }
 }
 
-void deleteUnitLoopCheck(ProductionRule& production, Variable& variable) {
+void deleteUnitLoopCheck(ProductionRule &production, Variable &variable) {
     bool b = false;
 
-    for (char c : production.order) {
+    for (char c: production.order) {
         auto itP = production.rule.find(c);
         for (auto s = itP->second.begin(); s != itP->second.end(); s++) {
             if (b) {
                 s = itP->second.begin();
                 b = false;
             }
-            if ((*s).size() == 1 && variable.symbols.find(((*s).at(0))) != variable.symbols.end() && (*s).at(0) == itP->first) {
+            if ((*s).size() == 1 && variable.symbols.find(((*s).at(0))) != variable.symbols.end() &&
+                (*s).at(0) == itP->first) {
                 b = true;
                 s = itP->second.erase(s);
                 if (itP->second.empty()) {
@@ -189,10 +191,10 @@ void deleteUnitLoopCheck(ProductionRule& production, Variable& variable) {
     }
 }
 
-void deleteUnitCheck(ProductionRule& production, const Variable& variable) {
+void deleteUnitCheck(ProductionRule &production, const Variable &variable) {
     bool b = false;
 
-    for (char c : production.order) {
+    for (char c: production.order) {
         auto itP = production.rule.find(c);
         for (auto s = itP->second.begin(); s != itP->second.end(); s++) {
             if (b) {
@@ -209,20 +211,20 @@ void deleteUnitCheck(ProductionRule& production, const Variable& variable) {
     }
 }
 
-void deleteUnit(ProductionRule& production, map<char, set<string>>::iterator itP, char c) {
-for (const string& s : production.rule.find(c)->second) {
-itP->second.insert(s);
-}
+void deleteUnit(ProductionRule &production, map<char, set<string>>::iterator itP, char c) {
+    for (const string &s: production.rule.find(c)->second) {
+        itP->second.insert(s);
+    }
 }
 
-void deleteUselessCheck(ProductionRule& production, Variable& variable, const Terminal& terminal) {
+void deleteUselessCheck(ProductionRule &production, Variable &variable, const Terminal &terminal) {
     bool b = false;
 
-    for (char c : production.order) {
+    for (char c: production.order) {
         auto itP = production.rule.find(c);
 
         bool findTer = false;
-        for (char t : terminal.terminals) {
+        for (char t: terminal.terminals) {
             string st;
             st = t;
             if (itP->second.find(st) != itP->second.end()) {
@@ -240,7 +242,7 @@ void deleteUselessCheck(ProductionRule& production, Variable& variable, const Te
 
             int cntVar = 0;
             bool itself = false;
-            for (char i : *s) {
+            for (char i: *s) {
                 if (variable.symbols.find(i) != variable.symbols.end()) cntVar++;
                 if (i == itP->first) itself = true;
             }
@@ -257,24 +259,24 @@ void deleteUselessCheck(ProductionRule& production, Variable& variable, const Te
     }
 }
 
-void deleteInaccessibleCheck(ProductionRule& production, Variable& variable) {
+void deleteInaccessibleCheck(ProductionRule &production, Variable &variable) {
     vector<pair<char, bool>> check;
     check.reserve(production.order.size());
 
-    for (char c : production.order) {
+    for (char c: production.order) {
         auto itV = variable.symbols.find(c);
         if (c == '0' || c == 'S') check.emplace_back(c, true);
         else check.emplace_back(c, false);
     }
 
-    queue<vector<pair<char, bool>>::iterator> visit;
+    queue <vector<pair<char, bool>>::iterator> visit;
     visit.push(check.begin());
 
     while (!visit.empty()) {
         deleteInaccessible(production, variable, check, visit);
     }
 
-    for (auto ch : check) {
+    for (auto ch: check) {
         if (!ch.second) {
             production.rule.erase(ch.first);
             production.order.erase(std::find(production.order.begin(), production.order.end(), ch.first));
@@ -283,28 +285,29 @@ void deleteInaccessibleCheck(ProductionRule& production, Variable& variable) {
     }
 }
 
-void deleteInaccessible(ProductionRule& production, const Variable& variable, vector<pair<char, bool>>& check, queue<vector<pair<char, bool>>::iterator>& visit) {
-auto itP = production.rule.find(visit.front()->first);
-visit.pop();
-for (const auto& s : itP->second) {
-for (char c : s) {
-if (variable.symbols.find(c) != variable.symbols.end()) {
-auto itCH = find_if(check.begin(), check.end(),
-                    [c](const pair<char, bool>& pr){
-                        return pr.first == c;
-                    });
-if (!itCH->second) {
-itCH->second = true;
-visit.push(itCH);
-}
-}
-}
-}
+void deleteInaccessible(ProductionRule &production, const Variable &variable, vector<pair<char, bool>> &check,
+                        queue <vector<pair<char, bool>>::iterator> &visit) {
+    auto itP = production.rule.find(visit.front()->first);
+    visit.pop();
+    for (const auto &s: itP->second) {
+        for (char c: s) {
+            if (variable.symbols.find(c) != variable.symbols.end()) {
+                auto itCH = find_if(check.begin(), check.end(),
+                                    [c](const pair<char, bool> &pr) {
+                                        return pr.first == c;
+                                    });
+                if (!itCH->second) {
+                    itCH->second = true;
+                    visit.push(itCH);
+                }
+            }
+        }
+    }
 }
 
-void newVarForTer(ProductionRule& production, Variable& variable, const Terminal& terminal) {
-    for (char c : terminal.terminals) {
-        for (char i : variable.symbols) {
+void newVarForTer(ProductionRule &production, Variable &variable, const Terminal &terminal) {
+    for (char c: terminal.terminals) {
+        for (char i: variable.symbols) {
             auto itP = production.rule.find(i);
             string tmp;
             tmp = c;
@@ -312,7 +315,7 @@ void newVarForTer(ProductionRule& production, Variable& variable, const Terminal
                 replaceTerToVal(production, c, i);
                 break;
             }
-            if ((i+1 >= 'A' && i+1 <= 'Z') && variable.symbols.find((char)(i + 1)) == variable.symbols.end()) {
+            if ((i + 1 >= 'A' && i + 1 <= 'Z') && variable.symbols.find((char) (i + 1)) == variable.symbols.end()) {
                 i++;
                 variable.symbols.insert(i);
                 production.order.push_back(i);
@@ -328,18 +331,18 @@ void newVarForTer(ProductionRule& production, Variable& variable, const Terminal
     }
 }
 
-void replaceTerToVal(ProductionRule& production, const char& before, const char& after) {
-    for (auto& p : production.rule) {
+void replaceTerToVal(ProductionRule &production, const char &before, const char &after) {
+    for (auto &p: production.rule) {
         if (p.first == after) continue;
         set<string> update;
 
-        for (auto& s : p.second) {
+        for (auto &s: p.second) {
             if (s.size() == 1 && s.at(0) == before) {
                 update.insert(s);
                 continue;
             }
             string tmp = s;
-            for (auto& c : tmp) {
+            for (auto &c: tmp) {
                 if (c == before) {
                     c = after;
                 }
@@ -350,10 +353,10 @@ void replaceTerToVal(ProductionRule& production, const char& before, const char&
     }
 }
 
-void newVarForTwoVar(ProductionRule& production, Variable& variable, const Terminal& terminal) {
-    for (auto& p : production.rule) {
+void newVarForTwoVar(ProductionRule &production, Variable &variable, const Terminal &terminal) {
+    for (auto &p: production.rule) {
         set<string> update;
-        for (auto s : p.second) {
+        for (auto s: p.second) {
             if (s.size() == 1 && terminal.terminals.find(s.at(0)) != terminal.terminals.end()) {
                 update.insert(s);
                 continue;
@@ -368,13 +371,13 @@ void newVarForTwoVar(ProductionRule& production, Variable& variable, const Termi
     }
 }
 
-void findVarForTwoVar(ProductionRule& production, Variable& variable, string& str) {
+void findVarForTwoVar(ProductionRule &production, Variable &variable, string &str) {
     if (!checkExistVar(production, str)) {
         string rep;
         rep = str.substr(0, 2);
 
-        for (char i : variable.symbols) {
-            if ((i+1 >= 'A' && i+1 <= 'Z') && variable.symbols.find((char)(i + 1)) == variable.symbols.end()) {
+        for (char i: variable.symbols) {
+            if ((i + 1 >= 'A' && i + 1 <= 'Z') && variable.symbols.find((char) (i + 1)) == variable.symbols.end()) {
                 i++;
                 variable.symbols.insert(i);
                 production.order.push_back(i);
@@ -393,13 +396,13 @@ void findVarForTwoVar(ProductionRule& production, Variable& variable, string& st
     }
 }
 
-bool checkExistVar(ProductionRule& production, string& str) {
+bool checkExistVar(ProductionRule &production, string &str) {
     for (auto c = str.begin(); c != str.end(); c++) {
         string find;
         find = *c;
-        find += (char)*(c + 1);
+        find += (char) *(c + 1);
 
-        for (auto p : production.rule) {
+        for (auto p: production.rule) {
             auto itP = p.second.find(find);
 
             if (itP != p.second.end() && p.second.size() == 1) {
@@ -417,21 +420,21 @@ bool checkExistVar(ProductionRule& production, string& str) {
     return false;
 }
 
-void print(const ProductionRule& production, const Terminal& terminal) {
+void print(const ProductionRule &production, const Terminal &terminal) {
     cout << production.order.size() << endl;
 
-    for (char c : terminal.terminals) {
+    for (char c: terminal.terminals) {
         cout << c << " ";
     }
     cout << endl;
 
-    for (char c : production.order) {
+    for (char c: production.order) {
         if (c == '0') cout << "S";
         cout << c << " ";
     }
     cout << endl;
 
-    for (char c : production.order) {
+    for (char c: production.order) {
         auto itP = production.rule.find(c);
         if (itP->first == '0') cout << "S";
         cout << itP->first << " -> ";
