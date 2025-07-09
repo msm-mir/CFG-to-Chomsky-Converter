@@ -79,7 +79,7 @@ void ProductionRule::findLambdaRHS(Variable &variable) {
             if (*s == "@") {
                 didRemove = true;
                 s = itP->second.erase(s);
-                deleteNull(this, highestRuleChanged, didPrevRuleChange, *p);
+                this->removeLambdaRHS(highestRuleChanged, didPrevRuleChange, *p);
 
                 if (itP->second.empty()) {
                     if (!didPrevRuleChange) p--;
@@ -92,5 +92,30 @@ void ProductionRule::findLambdaRHS(Variable &variable) {
             }
         }
         if (didPrevRuleChange) p = highestRuleChanged;
+    }
+}
+
+void ProductionRule::removeLambdaRHS(vector<char>::iterator &high, bool &change, const char &c) {
+    high = find(this->order.begin(), this->order.end(), c);
+
+    for (auto &i: this->rule) {
+        for (auto &j: i.second) {
+            string tmp = j;
+            if (tmp.find(c) != string::npos) {
+                tmp.erase(tmp.find(c), 1);
+                if (tmp.empty()) {
+                    tmp = "@";
+                }
+                if (j.size() != 1 || i.first != j.at(0)) {
+                    i.second.insert(tmp);
+
+                    if (tmp == "@" &&
+                        find(this->order.begin(), this->order.end(), i.first) < high) {
+                        high = find(this->order.begin(), this->order.end(), i.first);
+                        change = true;
+                    }
+                }
+            }
+        }
     }
 }

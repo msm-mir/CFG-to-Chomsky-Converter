@@ -5,8 +5,6 @@
 
 using namespace std;
 
-void removeLambdaRHS(ProductionRule &production, vector<char>::iterator &high, bool &change, char c);
-
 void deleteUnitLoopCheck(ProductionRule &, Variable &);
 
 void deleteUnitCheck(ProductionRule &, const Variable &);
@@ -73,31 +71,6 @@ int main() {
     print(productionRule, terminal);
 
     return 0;
-}
-
-void removeLambdaRHS(ProductionRule &production, vector<char>::iterator &high, bool &change, char c) {
-    high = find(production.order.begin(), production.order.end(), c);
-
-    for (auto &i: production.rule) {
-        for (auto &j: i.second) {
-            string tmp = j;
-            if (tmp.find(c) != string::npos) {
-                tmp.erase(tmp.find(c), 1);
-                if (tmp.empty()) {
-                    tmp = "@";
-                }
-                if (j.size() != 1 || i.first != j.at(0)) {
-                    i.second.insert(tmp);
-
-                    if (tmp == "@" &&
-                        find(production.order.begin(), production.order.end(), i.first) < high) {
-                        high = find(production.order.begin(), production.order.end(), i.first);
-                        change = true;
-                    }
-                }
-            }
-        }
-    }
 }
 
 void deleteUnitLoopCheck(ProductionRule &production, Variable &variable) {

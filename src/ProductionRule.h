@@ -24,6 +24,8 @@ public:
     void removeNonGrammarElementsRHS(const Variable &, const Terminal &);
 
     void findLambdaRHS(Variable &);
+
+    void removeLambdaRHS(vector<char>::iterator &, bool &, const char &);
 };
 
 #endif //SRC_PRODUCTIONRULE_H
