@@ -5,7 +5,7 @@
 
 using namespace std;
 
-void print(const ProductionRule &, const Terminal &);
+void printOutput(const ProductionRule &, const Terminal &);
 
 int main() {
     int cntRules;
@@ -45,33 +45,33 @@ int main() {
     terminal.terminals.erase('@');
     productionRule.newSymbolForTerminals(variable, terminal);
     productionRule.findDoubleSymbolsForNewSymbol(variable, terminal);
-    print(terminal);
+    printOutput(productionRule, terminal);
 
     return 0;
 }
 
-void print(const ProductionRule &production, const Terminal &terminal) {
+void printOutput(const ProductionRule &production, const Terminal &terminal) {
     cout << production.order.size() << endl;
 
-    for (char c: terminal.terminals) {
-        cout << c << " ";
+    for (char charTerminal: terminal.terminals) {
+        cout << charTerminal << " ";
     }
     cout << endl;
 
-    for (char c: production.order) {
-        if (c == '0') cout << "S";
-        cout << c << " ";
+    for (char LHS: production.order) {
+        if (LHS == '0') cout << "S";
+        cout << LHS << " ";
     }
     cout << endl;
 
-    for (char c: production.order) {
-        auto itP = production.rule.find(c);
-        if (itP->first == '0') cout << "S";
-        cout << itP->first << " -> ";
+    for (char LHS: production.order) {
+        auto itR = production.rule.find(LHS);
+        if (itR->first == '0') cout << "S";
+        cout << itR->first << " -> ";
 
-        for (auto p = itP->second.begin(); p != itP->second.end(); p++) {
-            if (next(p) == itP->second.end()) cout << *p;
-            else cout << *p << " | ";
+        for (auto RHS = itR->second.begin(); RHS != itR->second.end(); RHS++) {
+            if (next(RHS) == itR->second.end()) cout << *RHS;
+            else cout << *RHS << " | ";
         }
         cout << endl;
     }
