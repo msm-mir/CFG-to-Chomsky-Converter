@@ -5,8 +5,6 @@
 
 using namespace std;
 
-void replaceTerToVal(ProductionRule &, const char &, const char &);
-
 void newVarForTwoVar(ProductionRule &, Variable &, const Terminal &);
 
 void findVarForTwoVar(ProductionRule &, Variable &, string &);
@@ -56,28 +54,6 @@ int main() {
     print(terminal);
 
     return 0;
-}
-
-void replaceTerToVal(ProductionRule &production, const char &before, const char &after) {
-    for (auto &p: production.rule) {
-        if (p.first == after) continue;
-        set<string> update;
-
-        for (auto &s: p.second) {
-            if (s.size() == 1 && s.at(0) == before) {
-                update.insert(s);
-                continue;
-            }
-            string tmp = s;
-            for (auto &c: tmp) {
-                if (c == before) {
-                    c = after;
-                }
-            }
-            update.insert(tmp);
-        }
-        p.second = update;
-    }
 }
 
 void newVarForTwoVar(ProductionRule &production, Variable &variable, const Terminal &terminal) {

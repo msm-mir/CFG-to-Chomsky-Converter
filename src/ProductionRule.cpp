@@ -261,7 +261,7 @@ void ProductionRule::newSymbolForTerminals(Variable &variable, const Terminal &t
             string strTerminal;
             strTerminal = charTerminal;
             if (itR->second.size() == 1 && *(itR->second.begin()) == strTerminal) {
-                this->replaceTerToVal(charTerminal, charVariable);
+                this->replaceNewSymbolForTerminal(charTerminal, charVariable);
                 break;
             }
             if ((charVariable + 1 >= 'A' && charVariable + 1 <= 'Z') && variable.symbols.find((char) (charVariable + 1)) == variable.symbols.end()) {
@@ -273,9 +273,31 @@ void ProductionRule::newSymbolForTerminals(Variable &variable, const Terminal &t
                 strTer = charTerminal;
                 this->rule.insert({charVariable, {strTer}});
 
-                this->replaceTerToVal(charTerminal, charVariable);
+                this->replaceNewSymbolForTerminal(charTerminal, charVariable);
                 break;
             }
         }
+    }
+}
+
+void ProductionRule::replaceNewSymbolForTerminal(const char &before, const char &after) {
+    for (auto &rules: this->rule) {
+        if (rules.first == after) continue;
+        set<string> updateRHSs;
+
+        for (auto &RHS: rules.second) {
+            if (RHS.size() == 1 && RHS.at(0) == before) {
+                updateRHSs.insert(RHS);
+                continue;
+            }
+            string strRHS = RHS;
+            for (auto &charRHS: strRHS) {
+                if (charRHS == before) {
+                    charRHS = after;
+                }
+            }
+            updateRHSs.insert(strRHS);
+        }
+        rules.second = updateRHSs;
     }
 }
