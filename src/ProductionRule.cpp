@@ -32,31 +32,32 @@ void ProductionRule::ruleCheck(const char &character, char &LHS, string &RHS, bo
 }
 
 void ProductionRule::removeNonGrammarElementsRHS(const Variable &variable, const Terminal &terminal) {
-    vector<string> RHSsToRemove;
-
-    for (const auto &rules: this->rule) {
-        for (const string &RHS: rules.second) {
-            for (const char &c: RHS) {
-                auto itV = variable.symbols.find(c);
-                auto itT = terminal.terminals.find(c);
+    bool didRemove = false;
+    for (char LHS : this->order) {
+        auto itR = this->rule.find(LHS);
+        for (auto RHS = itR->second.begin(); RHS != itR->second.end(); RHS++) {
+            if (didRemove) {
+                RHS = itR->second.begin();
+                didRemove = false;
+            }
+            for (char charRHS : *RHS) {
+                auto itV = variable.symbols.find(charRHS);
+                auto itT = terminal.terminals.find(charRHS);
 
                 if (itV == variable.symbols.end() && itT == terminal.terminals.end()) {
-                    RHSsToRemove.push_back(RHS);
+                    didRemove = true;
                     break;
+                }
+            }
+            if (didRemove) {
+                RHS = itR->second.erase(RHS);
+                if (itR->second.empty()) {
+                    itR->second.insert("@");
                 }
             }
         }
     }
-
-    size_t idxV = 0;
-    for (auto &rules: this->rule) {
-        if (rules.second.find(RHSsToRemove.at(idxV)) != rules.second.end()) {
-            rules.second.erase(RHSsToRemove.at(idxV));
-            if (rules.second.empty())
-                rules.second.insert("@");
-            idxV++;
-        }
-    }
+}
 }
 
 void ProductionRule::findLambdaRHS(Variable &variable) {
