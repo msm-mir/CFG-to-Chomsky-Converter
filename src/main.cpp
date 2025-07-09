@@ -11,7 +11,6 @@
 
 using namespace std;
 
-void inputTer(Terminal&, const string&);
 void inputVar(Variable&, char&, const string&);
 void inputPro(ProductionRule&, const string&);
 void proCheck(const char&, char&, string&, bool&);
@@ -41,7 +40,7 @@ int main() {
     getline(cin, ter);
 
     Terminal terminal;
-    inputTer(terminal, ter);
+    terminal.inputTer(ter);
 
     string var;
     getline(cin, var);
@@ -72,14 +71,6 @@ int main() {
     print(production, terminal);
 
     return 0;
-}
-
-void inputTer(Terminal& terminal, const string& ter) {
-    for (char c : ter) {
-        if (c >= 'a' && c <= 'z')
-            terminal.t.insert(c);
-    }
-    terminal.t.insert('@');
 }
 
 void inputVar(Variable& variable, char& S, const string& var) {

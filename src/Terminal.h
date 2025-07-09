@@ -9,7 +9,7 @@ class Terminal {
 public:
     set<char> t;
     Terminal();
-    void inputTer(Terminal&, const string&);
+    void inputTer(const string&);
 };
 
 #endif //SRC_TERMINAL_H
