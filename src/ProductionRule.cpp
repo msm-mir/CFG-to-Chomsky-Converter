@@ -2,31 +2,31 @@
 
 ProductionRule::ProductionRule() = default;
 
-void ProductionRule::inputRule(const string& pro) {
+void ProductionRule::inputRule(const string& strRHS) {
     bool b = true;
-    string s;
-    char first;
-    set<string> second;
+    string productionBody;
+    char LHS;
+    set<string> RHS;
 
-    for (char c : pro) {
+    for (char c : strRHS) {
         if (c == '|') {
-            second.insert(s);
-            s.clear();
+            RHS.insert(productionBody);
+            productionBody.clear();
         }
-        ruleCheck(c, first, s, b);
+        ruleCheck(c, LHS, productionBody, b);
     }
-    second.insert(s);
-    this->rule.insert({first, second});
-    this->order.push_back(first);
+    RHS.insert(productionBody);
+    this->rule.insert({LHS, RHS});
+    this->order.push_back(LHS);
 }
 
-void ProductionRule::ruleCheck(const char& c, char& first, string& s, bool& b) {
-    if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c == '@')) {
-        if (b && (c >= 'A' && c <= 'Z')) {
-            first = c;
+void ProductionRule::ruleCheck(const char& character, char& LHS, string& RHS, bool& b) {
+    if ((character >= 'a' && character <= 'z') || (character >= 'A' && character <= 'Z') || (character == '@')) {
+        if (b && (character >= 'A' && character <= 'Z')) {
+            LHS = character;
             b = false;
         } else {
-            s += c;
+            RHS += character;
         }
     }
 }

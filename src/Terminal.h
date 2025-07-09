@@ -7,7 +7,7 @@ using namespace std;
 
 class Terminal {
 public:
-    set<char> ter;
+    set<char> terminals;
     Terminal();
     void inputTer(const string&);
 };

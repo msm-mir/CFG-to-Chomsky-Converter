@@ -28,32 +28,32 @@ bool checkExistVar(ProductionRule&, string&);
 void print(const ProductionRule&, const Terminal&);
 
 int main() {
-    int cntP;
-    cin >> cntP;
+    int cntRules;
+    cin >> cntRules;
 
-    string ter;
+    string terminalsInput;
     cin.ignore();
-    getline(cin, ter);
+    getline(cin, terminalsInput);
 
     Terminal terminal;
-    terminal.inputTer(ter);
+    terminal.inputTer(terminalsInput);
 
-    string var;
-    getline(cin, var);
+    string variablesInput;
+    getline(cin, variablesInput);
 
     Variable variable;
-    char S;
-    variable.inputVar(S, var);
+    char startSymbol;
+    variable.inputVariable(startSymbol, variablesInput);
 
     ProductionRule production;
-    while (cntP--) {
-        string pro;
-        getline(cin, pro);
+    while (cntRules--) {
+        string rulesInput;
+        getline(cin, rulesInput);
 
-        production.inputRule(pro);
+        production.inputRule(rulesInput);
     }
 
-    variable.newStartVar(production, S);
+    variable.newStartSymbol(production, startSymbol);
     deleteUnsubCheck(production, variable, terminal);
     deleteNullCheck(production, variable);
     deleteUnitLoopCheck(production, variable);
@@ -61,7 +61,7 @@ int main() {
     deleteUnitCheck(production, variable);
     deleteUselessCheck(production, variable, terminal);
     deleteInaccessibleCheck(production, variable);
-    terminal.ter.erase('@');
+    terminal.terminals.erase('@');
     newVarForTer(production, variable, terminal);
     newVarForTwoVar(production, variable, terminal);
     print(production, terminal);
@@ -70,12 +70,12 @@ int main() {
 }
 
 void deleteUnsubCheck(ProductionRule& production, Variable& variable, const Terminal& terminal) {
-    for (auto v = variable.var.begin(); v != variable.var.end(); v++) {
+    for (auto v = variable.symbols.begin(); v != variable.symbols.end(); v++) {
         auto itP = std::find(production.order.begin(), production.order.end(), *v);
         if (itP == production.order.end()) {
             char c = *v;
             v--;
-            variable.var.erase(c);
+            variable.symbols.erase(c);
         }
     }
 
@@ -88,10 +88,10 @@ void deleteUnsubCheck(ProductionRule& production, Variable& variable, const Term
                 del = false;
             }
             for (char i : *s) {
-                auto itV = variable.var.find(i);
-                auto itT = terminal.ter.find(i);
+                auto itV = variable.symbols.find(i);
+                auto itT = terminal.terminals.find(i);
 
-                if (itV == variable.var.end() && itT == terminal.ter.end()) {
+                if (itV == variable.symbols.end() && itT == terminal.terminals.end()) {
                     del = true;
                     break;
                 }
@@ -130,7 +130,7 @@ void deleteNullCheck(ProductionRule& production, Variable& variable) {
 
                 if (itP->second.empty()) {
                     if (!change) c--;
-                    variable.var.erase(itP->first);
+                    variable.symbols.erase(itP->first);
                     production.rule.erase(itP);
                     production.order.erase(c+1);
                 }
@@ -177,7 +177,7 @@ void deleteUnitLoopCheck(ProductionRule& production, Variable& variable) {
                 s = itP->second.begin();
                 b = false;
             }
-            if ((*s).size() == 1 && variable.var.find(((*s).at(0))) != variable.var.end() && (*s).at(0) == itP->first) {
+            if ((*s).size() == 1 && variable.symbols.find(((*s).at(0))) != variable.symbols.end() && (*s).at(0) == itP->first) {
                 b = true;
                 s = itP->second.erase(s);
                 if (itP->second.empty()) {
@@ -199,7 +199,7 @@ void deleteUnitCheck(ProductionRule& production, const Variable& variable) {
                 s = itP->second.begin();
                 b = false;
             }
-            if ((*s).size() == 1 && variable.var.find(((*s).at(0))) != variable.var.end()) {
+            if ((*s).size() == 1 && variable.symbols.find(((*s).at(0))) != variable.symbols.end()) {
                 b = true;
                 string tmp = *s;
                 s = itP->second.erase(s);
@@ -222,7 +222,7 @@ void deleteUselessCheck(ProductionRule& production, Variable& variable, const Te
         auto itP = production.rule.find(c);
 
         bool findTer = false;
-        for (char t : terminal.ter) {
+        for (char t : terminal.terminals) {
             string st;
             st = t;
             if (itP->second.find(st) != itP->second.end()) {
@@ -241,7 +241,7 @@ void deleteUselessCheck(ProductionRule& production, Variable& variable, const Te
             int cntVar = 0;
             bool itself = false;
             for (char i : *s) {
-                if (variable.var.find(i) != variable.var.end()) cntVar++;
+                if (variable.symbols.find(i) != variable.symbols.end()) cntVar++;
                 if (i == itP->first) itself = true;
             }
 
@@ -262,7 +262,7 @@ void deleteInaccessibleCheck(ProductionRule& production, Variable& variable) {
     check.reserve(production.order.size());
 
     for (char c : production.order) {
-        auto itV = variable.var.find(c);
+        auto itV = variable.symbols.find(c);
         if (c == '0' || c == 'S') check.emplace_back(c, true);
         else check.emplace_back(c, false);
     }
@@ -278,7 +278,7 @@ void deleteInaccessibleCheck(ProductionRule& production, Variable& variable) {
         if (!ch.second) {
             production.rule.erase(ch.first);
             production.order.erase(std::find(production.order.begin(), production.order.end(), ch.first));
-            variable.var.erase(ch.first);
+            variable.symbols.erase(ch.first);
         }
     }
 }
@@ -288,7 +288,7 @@ auto itP = production.rule.find(visit.front()->first);
 visit.pop();
 for (const auto& s : itP->second) {
 for (char c : s) {
-if (variable.var.find(c) != variable.var.end()) {
+if (variable.symbols.find(c) != variable.symbols.end()) {
 auto itCH = find_if(check.begin(), check.end(),
                     [c](const pair<char, bool>& pr){
                         return pr.first == c;
@@ -303,8 +303,8 @@ visit.push(itCH);
 }
 
 void newVarForTer(ProductionRule& production, Variable& variable, const Terminal& terminal) {
-    for (char c : terminal.ter) {
-        for (char i : variable.var) {
+    for (char c : terminal.terminals) {
+        for (char i : variable.symbols) {
             auto itP = production.rule.find(i);
             string tmp;
             tmp = c;
@@ -312,9 +312,9 @@ void newVarForTer(ProductionRule& production, Variable& variable, const Terminal
                 replaceTerToVal(production, c, i);
                 break;
             }
-            if ((i+1 >= 'A' && i+1 <= 'Z') && variable.var.find((char)(i + 1)) == variable.var.end()) {
+            if ((i+1 >= 'A' && i+1 <= 'Z') && variable.symbols.find((char)(i + 1)) == variable.symbols.end()) {
                 i++;
-                variable.var.insert(i);
+                variable.symbols.insert(i);
                 production.order.push_back(i);
 
                 string s;
@@ -354,7 +354,7 @@ void newVarForTwoVar(ProductionRule& production, Variable& variable, const Termi
     for (auto& p : production.rule) {
         set<string> update;
         for (auto s : p.second) {
-            if (s.size() == 1 && terminal.ter.find(s.at(0)) != terminal.ter.end()) {
+            if (s.size() == 1 && terminal.terminals.find(s.at(0)) != terminal.terminals.end()) {
                 update.insert(s);
                 continue;
             }
@@ -373,10 +373,10 @@ void findVarForTwoVar(ProductionRule& production, Variable& variable, string& st
         string rep;
         rep = str.substr(0, 2);
 
-        for (char i : variable.var) {
-            if ((i+1 >= 'A' && i+1 <= 'Z') && variable.var.find((char)(i + 1)) == variable.var.end()) {
+        for (char i : variable.symbols) {
+            if ((i+1 >= 'A' && i+1 <= 'Z') && variable.symbols.find((char)(i + 1)) == variable.symbols.end()) {
                 i++;
-                variable.var.insert(i);
+                variable.symbols.insert(i);
                 production.order.push_back(i);
                 production.rule.insert({i, {rep}});
 
@@ -420,7 +420,7 @@ bool checkExistVar(ProductionRule& production, string& str) {
 void print(const ProductionRule& production, const Terminal& terminal) {
     cout << production.order.size() << endl;
 
-    for (char c : terminal.ter) {
+    for (char c : terminal.terminals) {
         cout << c << " ";
     }
     cout << endl;

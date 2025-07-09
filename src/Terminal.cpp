@@ -5,7 +5,7 @@ Terminal::Terminal() = default;
 void Terminal::inputTer(const string& ter) {
     for (char c : ter) {
         if (c >= 'a' && c <= 'z')
-            this->ter.insert(c);
+            this->terminals.insert(c);
     }
-    this->ter.insert('@');
+    this->terminals.insert('@');
 }
