@@ -37,6 +37,8 @@ public:
     void findUselessRHS(Variable &, const Terminal &);
 
     void findInaccessibleLHS(Variable &);
+
+    void removeInaccessibleLHS(const Variable &, vector<pair<char, bool>> &, queue <vector<pair<char, bool>>::iterator> &);
 };
 
 #endif //SRC_PRODUCTIONRULE_H

@@ -223,7 +223,7 @@ void ProductionRule::findInaccessibleLHS(Variable &variable) {
     visitVariables.push(checkVarIsAccessible.begin());
 
     while (!visitVariables.empty()) {
-        this->deleteInaccessible(variable, checkVarIsAccessible, visitVariables);
+        this->removeInaccessibleLHS(variable, checkVarIsAccessible, visitVariables);
     }
 
     for (auto ch: checkVarIsAccessible) {
@@ -231,6 +231,25 @@ void ProductionRule::findInaccessibleLHS(Variable &variable) {
             this->rule.erase(ch.first);
             this->order.erase(std::find(this->order.begin(), this->order.end(), ch.first));
             variable.symbols.erase(ch.first);
+        }
+    }
+}
+
+void ProductionRule::removeInaccessibleLHS(const Variable &variable, vector<pair<char, bool>> &checkVarIsAccessible, queue <vector<pair<char, bool>>::iterator> &visitVariables) {
+    auto itR = this->rule.find(visitVariables.front()->first);
+    visitVariables.pop();
+    for (const auto &RHS: itR->second) {
+        for (char charRHS: RHS) {
+            if (variable.symbols.find(charRHS) != variable.symbols.end()) {
+                auto itCH = find_if(checkVarIsAccessible.begin(), checkVarIsAccessible.end(),
+                                    [charRHS](const pair<char, bool> &pr) {
+                                        return pr.first == charRHS;
+                                    });
+                if (!itCH->second) {
+                    itCH->second = true;
+                    visitVariables.push(itCH);
+                }
+            }
         }
     }
 }

@@ -5,9 +5,6 @@
 
 using namespace std;
 
-void deleteInaccessible(ProductionRule &, const Variable &, vector<pair<char, bool>> &,
-                        queue <vector<pair<char, bool>>::iterator> &);
-
 void newVarForTer(ProductionRule &, Variable &, const Terminal &);
 
 void replaceTerToVal(ProductionRule &, const char &, const char &);
@@ -61,26 +58,6 @@ int main() {
     print(terminal);
 
     return 0;
-}
-
-void deleteInaccessible(ProductionRule &production, const Variable &variable, vector<pair<char, bool>> &check,
-                        queue <vector<pair<char, bool>>::iterator> &visit) {
-    auto itP = production.rule.find(visit.front()->first);
-    visit.pop();
-    for (const auto &s: itP->second) {
-        for (char c: s) {
-            if (variable.symbols.find(c) != variable.symbols.end()) {
-                auto itCH = find_if(check.begin(), check.end(),
-                                    [c](const pair<char, bool> &pr) {
-                                        return pr.first == c;
-                                    });
-                if (!itCH->second) {
-                    itCH->second = true;
-                    visit.push(itCH);
-                }
-            }
-        }
-    }
 }
 
 void newVarForTer(ProductionRule &production, Variable &variable, const Terminal &terminal) {
