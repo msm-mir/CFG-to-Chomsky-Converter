@@ -5,8 +5,6 @@
 
 using namespace std;
 
-void deleteUnsubCheck(ProductionRule &, Variable &, const Terminal &);
-
 void deleteNullCheck(ProductionRule &, Variable &);
 
 void deleteNull(ProductionRule &, vector<char>::iterator &, bool &, char);
@@ -64,7 +62,7 @@ int main() {
 
     variable.newStartSymbol(productionRule, startSymbol);
     variable.removeUnusedSymbols(productionRule);
-    deleteUnsubCheck(productionRule, variable, terminal);
+    productionRule.removeNonGrammarElementsRHS(variable, terminal);
     deleteNullCheck(productionRule, variable);
     deleteUnitLoopCheck(productionRule, variable);
     deleteUselessCheck(productionRule, variable, terminal);
@@ -77,34 +75,6 @@ int main() {
     print(productionRule, terminal);
 
     return 0;
-}
-
-void deleteUnsubCheck(ProductionRule &production, Variable &variable, const Terminal &terminal) {
-    bool del = false;
-    for (char c: production.order) {
-        auto itP = production.rule.find(c);
-        for (auto s = itP->second.begin(); s != itP->second.end(); s++) {
-            if (del) {
-                s = itP->second.begin();
-                del = false;
-            }
-            for (char i: *s) {
-                auto itV = variable.symbols.find(i);
-                auto itT = terminal.terminals.find(i);
-
-                if (itV == variable.symbols.end() && itT == terminal.terminals.end()) {
-                    del = true;
-                    break;
-                }
-            }
-            if (del) {
-                s = itP->second.erase(s);
-                if (itP->second.empty()) {
-                    itP->second.insert("@");
-                }
-            }
-        }
-    }
 }
 
 void deleteNullCheck(ProductionRule &production, Variable &variable) {

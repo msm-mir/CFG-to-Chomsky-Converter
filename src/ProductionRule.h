@@ -5,6 +5,8 @@
 #include <set>
 #include <vector>
 #include <map>
+#include "Variable.h"
+#include "Terminal.h"
 
 using namespace std;
 
@@ -18,6 +20,8 @@ public:
     void inputRule(const string &);
 
     static void ruleCheck(const char &, char &, string &, bool &);
+
+    void removeNonGrammarElementsRHS(const Variable &, const Terminal &);
 };
 
 #endif //SRC_PRODUCTIONRULE_H

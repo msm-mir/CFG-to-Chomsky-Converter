@@ -30,3 +30,29 @@ void ProductionRule::ruleCheck(const char &character, char &LHS, string &RHS, bo
         }
     }
 }
+
+void ProductionRule::removeNonGrammarElementsRHS(const Variable &variable, const Terminal &terminal) {
+    vector<string> RHSsToRemove;
+
+    for (const auto &r: this->rule) {
+        for (const string &rhs: r.second) {
+            for (const char &c: rhs) {
+                auto itV = variable.symbols.find(c);
+                auto itT = terminal.terminals.find(c);
+
+                if (itV == variable.symbols.end() && itT == terminal.terminals.end()) {
+                    RHSsToRemove.push_back(rhs);
+                    break;
+                }
+            }
+        }
+    }
+
+    size_t idxV = 0;
+    for (auto &r : this->rule) {
+        if (r.second.find(RHSsToRemove.at(idxV)) != r.second.end()) {
+            r.second.erase(RHSsToRemove.at(idxV));
+            idxV++;
+        }
+    }
+}
