@@ -5,9 +5,7 @@
 
 using namespace std;
 
-void deleteNullCheck(ProductionRule &, Variable &);
-
-void deleteNull(ProductionRule &, vector<char>::iterator &, bool &, char);
+void removeLambdaRHS(ProductionRule &production, vector<char>::iterator &high, bool &change, char c);
 
 void deleteUnitLoopCheck(ProductionRule &, Variable &);
 
@@ -63,7 +61,7 @@ int main() {
     variable.newStartSymbol(productionRule, startSymbol);
     variable.removeUnusedSymbols(productionRule);
     productionRule.removeNonGrammarElementsRHS(variable, terminal);
-    deleteNullCheck(productionRule, variable);
+    productionRule.findLambdaRHS(variable);
     deleteUnitLoopCheck(productionRule, variable);
     deleteUselessCheck(productionRule, variable, terminal);
     deleteUnitCheck(productionRule, variable);
@@ -77,43 +75,7 @@ int main() {
     return 0;
 }
 
-void deleteNullCheck(ProductionRule &production, Variable &variable) {
-    bool b = false;
-    vector<char>::iterator high;
-    bool change = false;
-
-    for (auto c = production.order.begin(); c != production.order.end(); c++) {
-        if (change) {
-            change = false;
-            c = high;
-        }
-        auto itP = production.rule.find(*c);
-        for (auto s = itP->second.begin(); s != itP->second.end(); s++) {
-            if (b) {
-                s = itP->second.begin();
-                b = false;
-            }
-
-            if (*s == "@") {
-                b = true;
-                s = itP->second.erase(s);
-                deleteNull(production, high, change, *c);
-
-                if (itP->second.empty()) {
-                    if (!change) c--;
-                    variable.symbols.erase(itP->first);
-                    production.rule.erase(itP);
-                    production.order.erase(c + 1);
-                }
-
-                if (change) break;
-            }
-        }
-        if (change) c = high;
-    }
-}
-
-void deleteNull(ProductionRule &production, vector<char>::iterator &high, bool &change, char c) {
+void removeLambdaRHS(ProductionRule &production, vector<char>::iterator &high, bool &change, char c) {
     high = find(production.order.begin(), production.order.end(), c);
 
     for (auto &i: production.rule) {
@@ -154,7 +116,7 @@ void deleteUnitLoopCheck(ProductionRule &production, Variable &variable) {
                 s = itP->second.erase(s);
                 if (itP->second.empty()) {
                     itP->second.insert("@");
-                    deleteNullCheck(production, variable);
+                    findLambdaRHS(production, variable);
                 }
             }
         }
@@ -222,7 +184,7 @@ void deleteUselessCheck(ProductionRule &production, Variable &variable, const Te
                 s = itP->second.erase(s);
                 if (itP->second.empty()) {
                     itP->second.insert("@");
-                    deleteNullCheck(production, variable);
+                    findLambdaRHS(production, variable);
                 }
             }
         }

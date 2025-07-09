@@ -3,7 +3,7 @@
 ProductionRule::ProductionRule() = default;
 
 void ProductionRule::inputRule(const string &strRHS) {
-    bool b = true;
+    bool isLHS = true;
     string productionBody;
     char LHS;
     set<string> RHS;
@@ -13,18 +13,18 @@ void ProductionRule::inputRule(const string &strRHS) {
             RHS.insert(productionBody);
             productionBody.clear();
         }
-        ruleCheck(c, LHS, productionBody, b);
+        ruleCheck(c, LHS, productionBody, isLHS);
     }
     RHS.insert(productionBody);
     this->rule.insert({LHS, RHS});
     this->order.push_back(LHS);
 }
 
-void ProductionRule::ruleCheck(const char &character, char &LHS, string &RHS, bool &b) {
+void ProductionRule::ruleCheck(const char &character, char &LHS, string &RHS, bool &isLHS) {
     if ((character >= 'a' && character <= 'z') || (character >= 'A' && character <= 'Z') || (character == '@')) {
-        if (b && (character >= 'A' && character <= 'Z')) {
+        if (isLHS && (character >= 'A' && character <= 'Z')) {
             LHS = character;
-            b = false;
+            isLHS = false;
         } else {
             RHS += character;
         }
@@ -49,10 +49,48 @@ void ProductionRule::removeNonGrammarElementsRHS(const Variable &variable, const
     }
 
     size_t idxV = 0;
-    for (auto &r : this->rule) {
+    for (auto &r: this->rule) {
         if (r.second.find(RHSsToRemove.at(idxV)) != r.second.end()) {
             r.second.erase(RHSsToRemove.at(idxV));
+            if (r.second.empty())
+                r.second.insert("@");
             idxV++;
         }
+    }
+}
+
+void ProductionRule::findLambdaRHS(Variable &variable) {
+    bool didRemove = false;
+    vector<char>::iterator highestRuleChanged;
+    bool didPrevRuleChange = false;
+
+    for (auto p = this->order.begin(); p != this->order.end(); p++) {
+        if (didPrevRuleChange) {
+            didPrevRuleChange = false;
+            p = highestRuleChanged;
+        }
+        auto itP = this->rule.find(*p);
+        for (auto s = itP->second.begin(); s != itP->second.end(); s++) {
+            if (didRemove) {
+                s = itP->second.begin();
+                didRemove = false;
+            }
+
+            if (*s == "@") {
+                didRemove = true;
+                s = itP->second.erase(s);
+                deleteNull(this, highestRuleChanged, didPrevRuleChange, *p);
+
+                if (itP->second.empty()) {
+                    if (!didPrevRuleChange) p--;
+                    variable.symbols.erase(itP->first);
+                    this->rule.erase(itP);
+                    this->order.erase(p + 1);
+                }
+
+                if (didPrevRuleChange) break;
+            }
+        }
+        if (didPrevRuleChange) p = highestRuleChanged;
     }
 }

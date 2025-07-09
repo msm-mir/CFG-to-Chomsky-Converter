@@ -22,6 +22,8 @@ public:
     static void ruleCheck(const char &, char &, string &, bool &);
 
     void removeNonGrammarElementsRHS(const Variable &, const Terminal &);
+
+    void findLambdaRHS(Variable &);
 };
 
 #endif //SRC_PRODUCTIONRULE_H
