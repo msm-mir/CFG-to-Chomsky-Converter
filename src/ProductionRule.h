@@ -47,6 +47,8 @@ public:
     void findDoubleSymbolsForNewSymbol(Variable &, const Terminal &);
 
     void newSymbolForDoubleSymbols(Variable &, string &);
+
+    bool checkIfSymbolExistsForDoubleSymbol(string &);
 };
 
 #endif //SRC_PRODUCTIONRULE_H

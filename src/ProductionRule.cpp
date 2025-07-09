@@ -321,7 +321,7 @@ void ProductionRule::findDoubleSymbolsForNewSymbol(Variable &variable, const Ter
 }
 
 void ProductionRule::newSymbolForDoubleSymbols(Variable &variable, string &strRHS) {
-    if (!this->checkExistVar(strRHS)) {
+    if (!this->checkIfSymbolExistsForDoubleSymbol(strRHS)) {
         string doubleSymbols;
         doubleSymbols = strRHS.substr(0, 2);
 
@@ -343,4 +343,28 @@ void ProductionRule::newSymbolForDoubleSymbols(Variable &variable, string &strRH
             }
         }
     }
+}
+
+bool ProductionRule::checkIfSymbolExistsForDoubleSymbol(string &strRHS) {
+    for (auto charRHS = strRHS.begin(); charRHS != strRHS.end(); charRHS++) {
+        string doubleSymbols;
+        doubleSymbols = *charRHS;
+        doubleSymbols += (char) *(charRHS + 1);
+
+        for (auto rules: this->rule) {
+            auto itR = rules.second.find(doubleSymbols);
+
+            if (itR != rules.second.end() && rules.second.size() == 1) {
+                size_t posStrRHS;
+                string tmpStrRHS = strRHS;
+
+                while ((posStrRHS = tmpStrRHS.find(doubleSymbols)) != string::npos) {
+                    tmpStrRHS.replace(posStrRHS, doubleSymbols.length(), 1, rules.first);
+                }
+                strRHS = tmpStrRHS;
+                return true;
+            }
+        }
+    }
+    return false;
 }

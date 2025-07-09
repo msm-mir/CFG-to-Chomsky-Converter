@@ -5,8 +5,6 @@
 
 using namespace std;
 
-bool checkExistVar(ProductionRule &, string &);
-
 void print(const ProductionRule &, const Terminal &);
 
 int main() {
@@ -50,30 +48,6 @@ int main() {
     print(terminal);
 
     return 0;
-}
-
-bool checkExistVar(ProductionRule &production, string &str) {
-    for (auto c = str.begin(); c != str.end(); c++) {
-        string find;
-        find = *c;
-        find += (char) *(c + 1);
-
-        for (auto p: production.rule) {
-            auto itP = p.second.find(find);
-
-            if (itP != p.second.end() && p.second.size() == 1) {
-                size_t pos;
-                string tmp = str;
-
-                while ((pos = tmp.find(find)) != string::npos) {
-                    tmp.replace(pos, find.length(), 1, p.first);
-                }
-                str = tmp;
-                return true;
-            }
-        }
-    }
-    return false;
 }
 
 void print(const ProductionRule &production, const Terminal &terminal) {
