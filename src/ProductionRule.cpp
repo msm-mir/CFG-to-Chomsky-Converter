@@ -155,8 +155,14 @@ void ProductionRule::findUnitRHS(const Variable &variable) {
                 didReplace = true;
                 string tmp = *RHS;
                 RHS = itR->second.erase(RHS);
-                this->deleteUnit(itR, tmp.at(0));
+                this->removeUnitRHS(itR, tmp.at(0));
             }
         }
+    }
+}
+
+void ProductionRule::removeUnitRHS(const map<char, set<string>>::iterator &itR, const char &RHS) {
+    for (const string &strRHS: this->rule.find(RHS)->second) {
+        itR->second.insert(strRHS);
     }
 }

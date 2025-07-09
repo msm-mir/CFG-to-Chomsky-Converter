@@ -5,8 +5,6 @@
 
 using namespace std;
 
-void deleteUnit(ProductionRule &, map<char, set<string>>::iterator, char);
-
 void deleteUselessCheck(ProductionRule &, Variable &, const Terminal &);
 
 void deleteInaccessibleCheck(ProductionRule &, Variable &);
@@ -67,12 +65,6 @@ int main() {
     print(productionRule, terminal);
 
     return 0;
-}
-
-void deleteUnit(ProductionRule &production, map<char, set<string>>::iterator itP, char c) {
-    for (const string &s: production.rule.find(c)->second) {
-        itP->second.insert(s);
-    }
 }
 
 void deleteUselessCheck(ProductionRule &production, Variable &variable, const Terminal &terminal) {
