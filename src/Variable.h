@@ -4,9 +4,10 @@
 #include <set>
 #include <string>
 #include <algorithm>
-#include "ProductionRule.h"
 
 using namespace std;
+
+class ProductionRule;
 
 class Variable {
 public:

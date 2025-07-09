@@ -1,4 +1,5 @@
 #include "Variable.h"
+#include "ProductionRule.h"
 
 Variable::Variable() = default;
 

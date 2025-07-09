@@ -6,10 +6,11 @@
 #include <vector>
 #include <map>
 #include <queue>
-#include "Variable.h"
-#include "Terminal.h"
 
 using namespace std;
+
+class Variable;
+class Terminal;
 
 class ProductionRule {
 public:

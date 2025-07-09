@@ -1,4 +1,6 @@
 #include "ProductionRule.h"
+#include "Variable.h"
+#include "Terminal.h"
 
 ProductionRule::ProductionRule() = default;
 
@@ -57,7 +59,6 @@ void ProductionRule::removeNonGrammarElementsRHS(const Variable &variable, const
             }
         }
     }
-}
 }
 
 void ProductionRule::findLambdaRHS(Variable &variable) {
