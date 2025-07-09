@@ -16,7 +16,7 @@ void ProductionRule::inputRule(const string& pro) {
         ruleCheck(c, first, s, b);
     }
     second.insert(s);
-    this->p.insert({first, second});
+    this->rule.insert({first, second});
     this->order.push_back(first);
 }
 

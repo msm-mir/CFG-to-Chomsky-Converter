@@ -9,7 +9,7 @@ using namespace std;
 
 class ProductionRule {
 public:
-    map<char, set<string>> p;
+    map<char, set<string>> rule;
     vector<char> order;
     ProductionRule();
     void inputRule(const string&);
