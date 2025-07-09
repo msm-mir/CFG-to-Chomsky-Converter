@@ -26,6 +26,8 @@ public:
     void findLambdaRHS(Variable &);
 
     void removeLambdaRHS(vector<char>::iterator &, bool &, const char &);
+
+    void findAndRemoveSelfLoopRHS(Variable &);
 };
 
 #endif //SRC_PRODUCTIONRULE_H

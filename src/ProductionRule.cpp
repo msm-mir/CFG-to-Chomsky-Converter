@@ -8,12 +8,12 @@ void ProductionRule::inputRule(const string &strRHS) {
     char LHS;
     set<string> RHS;
 
-    for (char c: strRHS) {
-        if (c == '|') {
+    for (char charRHS: strRHS) {
+        if (charRHS == '|') {
             RHS.insert(productionBody);
             productionBody.clear();
         }
-        ruleCheck(c, LHS, productionBody, isLHS);
+        ruleCheck(charRHS, LHS, productionBody, isLHS);
     }
     RHS.insert(productionBody);
     this->rule.insert({LHS, RHS});
@@ -34,14 +34,14 @@ void ProductionRule::ruleCheck(const char &character, char &LHS, string &RHS, bo
 void ProductionRule::removeNonGrammarElementsRHS(const Variable &variable, const Terminal &terminal) {
     vector<string> RHSsToRemove;
 
-    for (const auto &r: this->rule) {
-        for (const string &rhs: r.second) {
-            for (const char &c: rhs) {
+    for (const auto &rules: this->rule) {
+        for (const string &RHS: rules.second) {
+            for (const char &c: RHS) {
                 auto itV = variable.symbols.find(c);
                 auto itT = terminal.terminals.find(c);
 
                 if (itV == variable.symbols.end() && itT == terminal.terminals.end()) {
-                    RHSsToRemove.push_back(rhs);
+                    RHSsToRemove.push_back(RHS);
                     break;
                 }
             }
@@ -49,11 +49,11 @@ void ProductionRule::removeNonGrammarElementsRHS(const Variable &variable, const
     }
 
     size_t idxV = 0;
-    for (auto &r: this->rule) {
-        if (r.second.find(RHSsToRemove.at(idxV)) != r.second.end()) {
-            r.second.erase(RHSsToRemove.at(idxV));
-            if (r.second.empty())
-                r.second.insert("@");
+    for (auto &rules: this->rule) {
+        if (rules.second.find(RHSsToRemove.at(idxV)) != rules.second.end()) {
+            rules.second.erase(RHSsToRemove.at(idxV));
+            if (rules.second.empty())
+                rules.second.insert("@");
             idxV++;
         }
     }
@@ -64,58 +64,83 @@ void ProductionRule::findLambdaRHS(Variable &variable) {
     vector<char>::iterator highestRuleChanged;
     bool didPrevRuleChange = false;
 
-    for (auto p = this->order.begin(); p != this->order.end(); p++) {
+    for (auto LHS = this->order.begin(); LHS != this->order.end(); LHS++) {
         if (didPrevRuleChange) {
             didPrevRuleChange = false;
-            p = highestRuleChanged;
+            LHS = highestRuleChanged;
         }
-        auto itP = this->rule.find(*p);
-        for (auto s = itP->second.begin(); s != itP->second.end(); s++) {
+        auto itR = this->rule.find(*LHS);
+        for (auto RHS = itR->second.begin(); RHS != itR->second.end(); RHS++) {
             if (didRemove) {
-                s = itP->second.begin();
+                RHS = itR->second.begin();
                 didRemove = false;
             }
 
-            if (*s == "@") {
+            if (*RHS == "@") {
                 didRemove = true;
-                s = itP->second.erase(s);
-                this->removeLambdaRHS(highestRuleChanged, didPrevRuleChange, *p);
+                RHS = itR->second.erase(RHS);
+                this->removeLambdaRHS(highestRuleChanged, didPrevRuleChange, *LHS);
 
-                if (itP->second.empty()) {
-                    if (!didPrevRuleChange) p--;
-                    variable.symbols.erase(itP->first);
-                    this->rule.erase(itP);
-                    this->order.erase(p + 1);
+                if (itR->second.empty()) {
+                    if (!didPrevRuleChange) LHS--;
+                    variable.symbols.erase(itR->first);
+                    this->rule.erase(itR);
+                    this->order.erase(LHS + 1);
                 }
 
                 if (didPrevRuleChange) break;
             }
         }
-        if (didPrevRuleChange) p = highestRuleChanged;
+        if (didPrevRuleChange) LHS = highestRuleChanged;
     }
 }
 
-void ProductionRule::removeLambdaRHS(vector<char>::iterator &high, bool &change, const char &c) {
-    high = find(this->order.begin(), this->order.end(), c);
+void
+ProductionRule::removeLambdaRHS(vector<char>::iterator &highestRuleChanged, bool &didPrevRuleChange, const char &LHS) {
+    highestRuleChanged = find(this->order.begin(), this->order.end(), LHS);
 
-    for (auto &i: this->rule) {
-        for (auto &j: i.second) {
-            string tmp = j;
-            if (tmp.find(c) != string::npos) {
-                tmp.erase(tmp.find(c), 1);
-                if (tmp.empty()) {
-                    tmp = "@";
+    for (auto &rules: this->rule) {
+        for (auto &RHS: rules.second) {
+            string strRHS = RHS;
+            if (strRHS.find(LHS) != string::npos) {
+                strRHS.erase(strRHS.find(LHS), 1);
+                if (strRHS.empty()) {
+                    strRHS = "@";
                 }
-                if (j.size() != 1 || i.first != j.at(0)) {
-                    i.second.insert(tmp);
+                if (RHS.size() != 1 || rules.first != RHS.at(0)) {
+                    rules.second.insert(strRHS);
 
-                    if (tmp == "@" &&
-                        find(this->order.begin(), this->order.end(), i.first) < high) {
-                        high = find(this->order.begin(), this->order.end(), i.first);
-                        change = true;
+                    if (strRHS == "@" &&
+                        find(this->order.begin(), this->order.end(), rules.first) < highestRuleChanged) {
+                        highestRuleChanged = find(this->order.begin(), this->order.end(), rules.first);
+                        didPrevRuleChange = true;
                     }
                 }
             }
         }
     }
 }
+
+void ProductionRule::findAndRemoveSelfLoopRHS(Variable &variable) {
+    bool didRemove = false;
+
+    for (char LHS: this->order) {
+        auto itR = this->rule.find(LHS);
+        for (auto RHS = itR->second.begin(); RHS != itR->second.end(); RHS++) {
+            if (didRemove) {
+                RHS = itR->second.begin();
+                didRemove = false;
+            }
+            if ((*RHS).size() == 1 && variable.symbols.find(((*RHS).at(0))) != variable.symbols.end() &&
+                (*RHS).at(0) == itR->first) {
+                didRemove = true;
+                RHS = itR->second.erase(RHS);
+                if (itR->second.empty()) {
+                    itR->second.insert("@");
+                    this->findLambdaRHS(variable);
+                }
+            }
+        }
+    }
+}
+
