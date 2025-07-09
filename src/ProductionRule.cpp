@@ -166,3 +166,45 @@ void ProductionRule::removeUnitRHS(const map<char, set<string>>::iterator &itR, 
         itR->second.insert(strRHS);
     }
 }
+
+void ProductionRule::findUselessRHS(Variable &variable, const Terminal &terminal) {
+    bool didRemove = false;
+
+    for (char LHS: this->order) {
+        auto itR = this->rule.find(LHS);
+
+        bool didFindTerminal = false;
+        for (char charTerminal: terminal.terminals) {
+            string srtTerminal;
+            srtTerminal = charTerminal;
+            if (itR->second.find(srtTerminal) != itR->second.end()) {
+                didFindTerminal = true;
+                break;
+            }
+        }
+        if (didFindTerminal) continue;
+
+        for (auto RHS = itR->second.begin(); RHS != itR->second.end(); RHS++) {
+            if (didRemove) {
+                RHS = itR->second.begin();
+                didRemove = false;
+            }
+
+            int cntOfVariables = 0;
+            bool variableIsLHS = false;
+            for (char charRHS: *RHS) {
+                if (variable.symbols.find(charRHS) != variable.symbols.end()) cntOfVariables++;
+                if (charRHS == itR->first) variableIsLHS = true;
+            }
+
+            if (cntOfVariables == 1 && variableIsLHS) {
+                didRemove = true;
+                RHS = itR->second.erase(RHS);
+                if (itR->second.empty()) {
+                    itR->second.insert("@");
+                    this->findLambdaRHS(variable);
+                }
+            }
+        }
+    }
+}

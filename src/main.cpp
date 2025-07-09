@@ -5,8 +5,6 @@
 
 using namespace std;
 
-void deleteUselessCheck(ProductionRule &, Variable &, const Terminal &);
-
 void deleteInaccessibleCheck(ProductionRule &, Variable &);
 
 void deleteInaccessible(ProductionRule &, const Variable &, vector<pair<char, bool>> &,
@@ -55,58 +53,16 @@ int main() {
     productionRule.removeNonGrammarElementsRHS(variable, terminal);
     productionRule.findLambdaRHS(variable);
     productionRule.findAndRemoveSelfLoopRHS(variable);
-    deleteUselessCheck(productionRule, variable, terminal);
-    productionRule.findUnitRHS(productionRule, variable);
-    deleteUselessCheck(productionRule, variable, terminal);
-    deleteInaccessibleCheck(productionRule, variable);
+    productionRule.findUselessRHS(variable, terminal);
+    productionRule.findUnitRHS(variable);
+    productionRule.findUselessRHS(variable, terminal);
+    deleteInaccessibleCheck(variable);
     terminal.terminals.erase('@');
-    newVarForTer(productionRule, variable, terminal);
-    newVarForTwoVar(productionRule, variable, terminal);
-    print(productionRule, terminal);
+    newVarForTer(variable, terminal);
+    newVarForTwoVar(variable, terminal);
+    print(terminal);
 
     return 0;
-}
-
-void deleteUselessCheck(ProductionRule &production, Variable &variable, const Terminal &terminal) {
-    bool b = false;
-
-    for (char c: production.order) {
-        auto itP = production.rule.find(c);
-
-        bool findTer = false;
-        for (char t: terminal.terminals) {
-            string st;
-            st = t;
-            if (itP->second.find(st) != itP->second.end()) {
-                findTer = true;
-                break;
-            }
-        }
-        if (findTer) continue;
-
-        for (auto s = itP->second.begin(); s != itP->second.end(); s++) {
-            if (b) {
-                s = itP->second.begin();
-                b = false;
-            }
-
-            int cntVar = 0;
-            bool itself = false;
-            for (char i: *s) {
-                if (variable.symbols.find(i) != variable.symbols.end()) cntVar++;
-                if (i == itP->first) itself = true;
-            }
-
-            if (cntVar == 1 && itself) {
-                b = true;
-                s = itP->second.erase(s);
-                if (itP->second.empty()) {
-                    itP->second.insert("@");
-                    findLambdaRHS(production, variable);
-                }
-            }
-        }
-    }
 }
 
 void deleteInaccessibleCheck(ProductionRule &production, Variable &variable) {

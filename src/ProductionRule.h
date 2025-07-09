@@ -32,6 +32,8 @@ public:
     void findUnitRHS(const Variable &);
 
     void removeUnitRHS(const map<char, set<string>>::iterator &, const char &);
+
+    void findUselessRHS(Variable &, const Terminal &);
 };
 
 #endif //SRC_PRODUCTIONRULE_H
