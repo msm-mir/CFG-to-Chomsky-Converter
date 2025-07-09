@@ -5,8 +5,6 @@
 
 using namespace std;
 
-void deleteUnitCheck(ProductionRule &, const Variable &);
-
 void deleteUnit(ProductionRule &, map<char, set<string>>::iterator, char);
 
 void deleteUselessCheck(ProductionRule &, Variable &, const Terminal &);
@@ -60,7 +58,7 @@ int main() {
     productionRule.findLambdaRHS(variable);
     productionRule.findAndRemoveSelfLoopRHS(variable);
     deleteUselessCheck(productionRule, variable, terminal);
-    deleteUnitCheck(productionRule, variable);
+    productionRule.findUnitRHS(productionRule, variable);
     deleteUselessCheck(productionRule, variable, terminal);
     deleteInaccessibleCheck(productionRule, variable);
     terminal.terminals.erase('@');
@@ -69,26 +67,6 @@ int main() {
     print(productionRule, terminal);
 
     return 0;
-}
-
-void deleteUnitCheck(ProductionRule &production, const Variable &variable) {
-    bool b = false;
-
-    for (char c: production.order) {
-        auto itP = production.rule.find(c);
-        for (auto s = itP->second.begin(); s != itP->second.end(); s++) {
-            if (b) {
-                s = itP->second.begin();
-                b = false;
-            }
-            if ((*s).size() == 1 && variable.symbols.find(((*s).at(0))) != variable.symbols.end()) {
-                b = true;
-                string tmp = *s;
-                s = itP->second.erase(s);
-                deleteUnit(production, itP, tmp.at(0));
-            }
-        }
-    }
 }
 
 void deleteUnit(ProductionRule &production, map<char, set<string>>::iterator itP, char c) {

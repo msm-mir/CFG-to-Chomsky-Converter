@@ -28,6 +28,8 @@ public:
     void removeLambdaRHS(vector<char>::iterator &, bool &, const char &);
 
     void findAndRemoveSelfLoopRHS(Variable &);
+
+    void findUnitRHS(const Variable &);
 };
 
 #endif //SRC_PRODUCTIONRULE_H

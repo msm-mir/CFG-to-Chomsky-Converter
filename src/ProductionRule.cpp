@@ -95,8 +95,7 @@ void ProductionRule::findLambdaRHS(Variable &variable) {
     }
 }
 
-void
-ProductionRule::removeLambdaRHS(vector<char>::iterator &highestRuleChanged, bool &didPrevRuleChange, const char &LHS) {
+void ProductionRule::removeLambdaRHS(vector<char>::iterator &highestRuleChanged, bool &didPrevRuleChange, const char &LHS) {
     highestRuleChanged = find(this->order.begin(), this->order.end(), LHS);
 
     for (auto &rules: this->rule) {
@@ -110,8 +109,7 @@ ProductionRule::removeLambdaRHS(vector<char>::iterator &highestRuleChanged, bool
                 if (RHS.size() != 1 || rules.first != RHS.at(0)) {
                     rules.second.insert(strRHS);
 
-                    if (strRHS == "@" &&
-                        find(this->order.begin(), this->order.end(), rules.first) < highestRuleChanged) {
+                    if (strRHS == "@" && find(this->order.begin(), this->order.end(), rules.first) < highestRuleChanged) {
                         highestRuleChanged = find(this->order.begin(), this->order.end(), rules.first);
                         didPrevRuleChange = true;
                     }
@@ -131,8 +129,7 @@ void ProductionRule::findAndRemoveSelfLoopRHS(Variable &variable) {
                 RHS = itR->second.begin();
                 didRemove = false;
             }
-            if ((*RHS).size() == 1 && variable.symbols.find(((*RHS).at(0))) != variable.symbols.end() &&
-                (*RHS).at(0) == itR->first) {
+            if ((*RHS).size() == 1 && variable.symbols.find(((*RHS).at(0))) != variable.symbols.end() && (*RHS).at(0) == itR->first) {
                 didRemove = true;
                 RHS = itR->second.erase(RHS);
                 if (itR->second.empty()) {
@@ -144,3 +141,22 @@ void ProductionRule::findAndRemoveSelfLoopRHS(Variable &variable) {
     }
 }
 
+void ProductionRule::findUnitRHS(const Variable &variable) {
+    bool didReplace = false;
+
+    for (char LHS: this->order) {
+        auto itR = this->rule.find(LHS);
+        for (auto RHS = itR->second.begin(); RHS != itR->second.end(); RHS++) {
+            if (didReplace) {
+                RHS = itR->second.begin();
+                didReplace = false;
+            }
+            if ((*RHS).size() == 1 && variable.symbols.find(((*RHS).at(0))) != variable.symbols.end()) {
+                didReplace = true;
+                string tmp = *RHS;
+                RHS = itR->second.erase(RHS);
+                this->deleteUnit(itR, tmp.at(0));
+            }
+        }
+    }
+}
