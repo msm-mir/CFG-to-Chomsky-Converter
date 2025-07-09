@@ -44,7 +44,9 @@ public:
 
     void replaceNewSymbolForTerminal(const char &, const char &);
 
-    void newSymbolForDoubleSymbols(Variable &, const Terminal &);
+    void findDoubleSymbolsForNewSymbol(Variable &, const Terminal &);
+
+    void findVarForTwoVar(Variable &, string &);
 };
 
 #endif //SRC_PRODUCTIONRULE_H

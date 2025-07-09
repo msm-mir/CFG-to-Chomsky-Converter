@@ -302,7 +302,7 @@ void ProductionRule::replaceNewSymbolForTerminal(const char &before, const char 
     }
 }
 
-void ProductionRule::newSymbolForDoubleSymbols(Variable &variable, const Terminal &terminal) {
+void ProductionRule::findDoubleSymbolsForNewSymbol(Variable &variable, const Terminal &terminal) {
     for (auto &rules: this->rule) {
         set<string> updateRHSs;
         for (auto RHS: rules.second) {
@@ -317,5 +317,30 @@ void ProductionRule::newSymbolForDoubleSymbols(Variable &variable, const Termina
             updateRHSs.insert(strRHS);
         }
         rules.second = updateRHSs;
+    }
+}
+
+void ProductionRule::findVarForTwoVar(Variable &variable, string &strRHS) {
+    if (!this->checkExistVar(strRHS)) {
+        string doubleSymbols;
+        doubleSymbols = strRHS.substr(0, 2);
+
+        for (char charSymbol: variable.symbols) {
+            if ((charSymbol + 1 >= 'A' && charSymbol + 1 <= 'Z') && variable.symbols.find((char) (charSymbol + 1)) == variable.symbols.end()) {
+                charSymbol++;
+                variable.symbols.insert(charSymbol);
+                this->order.push_back(charSymbol);
+                this->rule.insert({charSymbol, {doubleSymbols}});
+
+                size_t posStrRHS;
+                string tmpStrRHS = strRHS;
+
+                while ((posStrRHS = tmpStrRHS.find(doubleSymbols)) != string::npos) {
+                    tmpStrRHS.replace(posStrRHS, doubleSymbols.length(), 1, charSymbol);
+                }
+                strRHS = tmpStrRHS;
+                return;
+            }
+        }
     }
 }
