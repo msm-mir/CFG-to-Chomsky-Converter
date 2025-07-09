@@ -11,7 +11,6 @@
 
 using namespace std;
 
-void inputVar(Variable&, char&, const string&);
 void inputPro(ProductionRule&, const string&);
 void proCheck(const char&, char&, string&, bool&);
 void newStartVar(ProductionRule&, Variable&, const char&);
@@ -47,7 +46,7 @@ int main() {
 
     Variable variable;
     char S;
-    inputVar(variable, S, var);
+    variable.inputVar(S, var);
 
     ProductionRule production;
     while (cntP--) {
@@ -71,19 +70,6 @@ int main() {
     print(production, terminal);
 
     return 0;
-}
-
-void inputVar(Variable& variable, char& S, const string& var) {
-    bool i = true;
-    for (char c : var) {
-        if (c >= 'A' && c <= 'Z') {
-            if (i) {
-                S = c;
-                i = false;
-            }
-            variable.v.insert(c);
-        }
-    }
 }
 
 void inputPro(ProductionRule& production, const string& pro) {
