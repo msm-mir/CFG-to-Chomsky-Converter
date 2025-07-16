@@ -13,7 +13,7 @@ This project  converts a given **Context-Free Grammar (CFG)** into **Chomsky Nor
 
 ---
 
-## ⚙️ Technical Details
+## 🛠️ Technical Details
 
 - Implemented in C++
 - The core concept of the project is the transformation of CFGs into **Chomsky Normal Form (CNF)**
