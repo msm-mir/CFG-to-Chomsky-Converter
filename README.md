@@ -1,10 +1,10 @@
-# 🖨️ CFG to CNF Converter
+# CFG to CNF Converter
 
 This project  converts a given **Context-Free Grammar (CFG)** into **Chomsky Normal Form (CNF)**. The purpose of this transformation is to simplify the grammar and prepare it for parsing algorithms such as CYK. This program is implemented in **C++** as part of a Theory of Automata and Formal Language course and based on an object-oriented programming (OOP).
 
 ---
 
-## 💡 Features
+## Features
 
 - Reads a context-free grammar from input.
 - Input include: terminal symbols, non-terminal symbols, and production rules.
@@ -13,14 +13,14 @@ This project  converts a given **Context-Free Grammar (CFG)** into **Chomsky Nor
 
 ---
 
-## 🛠️ Technical Details
+## Technical Details
 
 - Implemented in C++
 - The core concept of the project is the transformation of CFGs into **Chomsky Normal Form (CNF)**
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 /CFGtoChomskyConverterProject
